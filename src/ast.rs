@@ -1,4 +1,4 @@
-use crate::lexer::Token;
+use crate::lexer::TokenKind;
 
 #[derive(Clone, Copy)]
 pub enum BinaryOperator {
@@ -20,17 +20,18 @@ impl std::fmt::Display for BinaryOperator {
 }
 
 impl BinaryOperator {
-    pub fn from_token(token: Token) -> Option<Self> {
-        match token {
-            Token::Plus => Some(Self::Plus),
-            Token::Minus => Some(Self::Minus),
-            Token::Star => Some(Self::Times),
-            Token::Slash => Some(Self::Divided),
+    pub fn from_token_kind(kind: TokenKind) -> Option<Self> {
+        match kind {
+            TokenKind::Plus => Some(Self::Plus),
+            TokenKind::Minus => Some(Self::Minus),
+            TokenKind::Star => Some(Self::Times),
+            TokenKind::Slash => Some(Self::Divided),
             _ => None,
         }
     }
 }
 
+#[derive(Clone)]
 pub enum Expression {
     IntegerLiteral(i32),
     Binary {

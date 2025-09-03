@@ -1,5 +1,5 @@
 #[derive(Clone, Debug)]
-pub enum Token {
+pub enum TokenKind {
     Plus,
     Minus,
     Star,
@@ -8,6 +8,33 @@ pub enum Token {
     ParenRight,
     Number(i32),
     EndOfFile,
+}
+
+impl std::fmt::Display for TokenKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Plus => write!(f, "+"),
+            Self::Minus => write!(f, "-"),
+            Self::Star => write!(f, "*"),
+            Self::Slash => write!(f, "/"),
+            Self::ParenLeft => write!(f, "("),
+            Self::ParenRight => write!(f, ")"),
+            Self::Number(n) => write!(f, "{n}"),
+            Self::EndOfFile => write!(f, "<eof>"),
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct Token {
+    pub kind: TokenKind,
+    pub length: usize,
+}
+
+impl Token {
+    pub const fn new(kind: TokenKind, length: usize) -> Self {
+        Self { kind, length }
+    }
 }
 
 #[derive(Debug)]
@@ -59,10 +86,10 @@ impl<I: Iterator<Item = char>> Lexer<I> {
             self.chars.next();
         }
 
-        return match digits.parse::<i32>() {
-            Ok(value) => Ok(Token::Number(value)),
+        match digits.parse::<i32>() {
+            Ok(value) => Ok(Token::new(TokenKind::Number(value), digits.len())),
             Err(error) => Err(LexError::InvalidInteger(error)),
-        };
+        }
     }
 }
 
@@ -73,20 +100,20 @@ impl<I: Iterator<Item = char>> Iterator for Lexer<I> {
         self.skip_whitespace();
 
         match self.chars.next() {
-            Some('+') => Some(Ok(Token::Plus)),
-            Some('-') => Some(Ok(Token::Minus)),
-            Some('*') => Some(Ok(Token::Star)),
-            Some('/') => Some(Ok(Token::Slash)),
-            Some('(') => Some(Ok(Token::ParenLeft)),
-            Some(')') => Some(Ok(Token::ParenRight)),
-            Some(other) if other.is_ascii_digit() => Some(self.lex_number(other)),
+            Some('+') => Some(Ok(Token::new(TokenKind::Plus, 1))),
+            Some('-') => Some(Ok(Token::new(TokenKind::Minus, 1))),
+            Some('*') => Some(Ok(Token::new(TokenKind::Star, 1))),
+            Some('/') => Some(Ok(Token::new(TokenKind::Slash, 1))),
+            Some('(') => Some(Ok(Token::new(TokenKind::ParenLeft, 1))),
+            Some(')') => Some(Ok(Token::new(TokenKind::ParenRight, 1))),
+            Some(first) if first.is_ascii_digit() => Some(self.lex_number(first)),
             Some(other) => Some(Err(LexError::InvalidToken(other))),
 
             // We only want to emit the EndOfFile token once per stream, right at the end.
             None if self.dispensed_eof => None,
             None => {
                 self.dispensed_eof = true;
-                Some(Ok(Token::EndOfFile))
+                Some(Ok(Token::new(TokenKind::EndOfFile, 0)))
             }
         }
     }
