@@ -50,14 +50,19 @@ pub fn pretty_print(expr: &Expression) {
                 left,
                 right,
             } => {
-                println!("{indent}└── BinaryExpression {operator}");
+                let new_indent = if is_last {
+                    format!("{indent}    ")
+                } else {
+                    format!("{indent}│   ")
+                };
 
-                let new_indent = format!("{indent}    ");
+                println!("{indent}{branch}BinaryExpression {operator}");
                 aux(left.as_ref(), &new_indent, false);
                 aux(right.as_ref(), &new_indent, true);
             }
         }
     }
 
+    println!(".");
     aux(expr, "", true);
 }
