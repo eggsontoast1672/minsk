@@ -1,15 +1,14 @@
 use crate::lexer::Token;
 
-pub struct IntegerLiteral(pub i32);
-
-pub enum BinaryOperation {
+#[derive(Clone, Copy)]
+pub enum BinaryOperator {
     Plus,
     Minus,
     Times,
     Divided,
 }
 
-impl BinaryOperation {
+impl BinaryOperator {
     pub fn from_token(token: Token) -> Option<Self> {
         match token {
             Token::Plus => Some(Self::Plus),
@@ -21,15 +20,13 @@ impl BinaryOperation {
     }
 }
 
-pub struct BinaryExpression {
-    pub operator: BinaryOperation,
-    pub left: Box<Expression>,
-    pub right: Box<Expression>,
-}
-
 pub enum Expression {
-    Integer(IntegerLiteral),
-    Binary(BinaryExpression),
+    IntegerLiteral(i32),
+    Binary {
+        operator: BinaryOperator,
+        left: Box<Expression>,
+        right: Box<Expression>,
+    },
 }
 
 // pub fn pretty_print(expr: Expression, indent: &str, is_last: bool) {

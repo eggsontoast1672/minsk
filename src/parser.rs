@@ -1,7 +1,7 @@
 use std::iter::Peekable;
 
 use crate::{
-    ast::{BinaryExpression, BinaryOperation, Expression, IntegerLiteral},
+    ast::{BinaryOperator, Expression},
     lexer::Token,
 };
 
@@ -55,11 +55,11 @@ where
             // BinaryOperation.
             let operator = self.tokens.next().unwrap();
             let right = self.parse_factor();
-            left = Expression::Binary(BinaryExpression {
-                operator: BinaryOperation::from_token(operator).unwrap(),
+            left = Expression::Binary {
+                operator: BinaryOperator::from_token(operator).unwrap(),
                 left: Box::new(left),
                 right: Box::new(right),
-            });
+            };
         }
 
         left
@@ -76,11 +76,11 @@ where
             // These unwrap calls are safe for the same reasons as above.
             let operator = self.tokens.next().unwrap();
             let right = self.parse_primary();
-            left = Expression::Binary(BinaryExpression {
-                operator: BinaryOperation::from_token(operator).unwrap(),
+            left = Expression::Binary {
+                operator: BinaryOperator::from_token(operator).unwrap(),
                 left: Box::new(left),
                 right: Box::new(right),
-            });
+            };
         }
 
         left
@@ -96,7 +96,7 @@ where
                 };
                 expr
             }
-            Token::Number(value) => Expression::Integer(IntegerLiteral(value)),
+            Token::Number(value) => Expression::IntegerLiteral(value),
             _ => panic!("unexpected token"),
         }
     }
