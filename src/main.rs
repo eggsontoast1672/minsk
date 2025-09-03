@@ -1,20 +1,18 @@
-use minsk::{
-    ast::{BinaryExpression, BinaryOperation, Expression, IntegerLiteral},
-    eval,
-};
+use minsk::{eval, lexer::Token, parser::Parser};
 
 fn main() {
-    let expr = BinaryExpression {
-        operator: BinaryOperation::Plus,
-        left: Box::new(Expression::Integer(IntegerLiteral(1))),
-        right: Box::new(Expression::Binary(BinaryExpression {
-            operator: BinaryOperation::Times,
-            left: Box::new(Expression::Integer(IntegerLiteral(2))),
-            right: Box::new(Expression::Integer(IntegerLiteral(3))),
-        })),
-    };
+    let tokens = vec![
+        Token::Number(1),
+        Token::Plus,
+        Token::Number(2),
+        Token::Star,
+        Token::Number(3),
+        Token::EndOfFile,
+    ];
 
-    let result = eval::evaluate_binary(expr);
+    let mut parser = Parser::new(tokens);
+    let ast = parser.parse();
+    let result = eval::evaluate(ast);
 
     println!("result = {result}");
 }
