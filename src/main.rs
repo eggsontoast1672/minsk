@@ -1,3 +1,5 @@
+use std::io::Write;
+
 use minsk::{ast, eval, lexer::Lexer, parser::Parser};
 
 fn the_whole_kitchen_sink(source: &str) {
@@ -18,7 +20,17 @@ fn the_whole_kitchen_sink(source: &str) {
     println!("\nResult: {result}");
 }
 
+fn get_line(prompt: &str) -> Option<String> {
+    print!("{prompt}");
+    std::io::stdout().flush().unwrap();
+    std::io::stdin().lines().next().map(|l| l.unwrap())
+}
+
 fn main() {
-    let source = "1 + 2 * 3";
-    the_whole_kitchen_sink(source);
+    let version = env!("CARGO_PKG_VERSION");
+    println!("Interactive prompt for Minsk version {version}");
+
+    while let Some(line) = get_line(">>> ") {
+        the_whole_kitchen_sink(&line);
+    }
 }
