@@ -1,6 +1,0 @@
-Interpreter Data Pipeline
-
-Source code ---(lexical analysis)-----> tokens 
-            ---(syntactic analysis)---> abstract syntax tree
-            ---(evaluation)-----------> interpreted value
-            ---(formatting)-----------> string representation
