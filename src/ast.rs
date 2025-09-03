@@ -8,6 +8,17 @@ pub enum BinaryOperator {
     Divided,
 }
 
+impl std::fmt::Display for BinaryOperator {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Plus => write!(f, "+"),
+            Self::Minus => write!(f, "-"),
+            Self::Times => write!(f, "*"),
+            Self::Divided => write!(f, "/"),
+        }
+    }
+}
+
 impl BinaryOperator {
     pub fn from_token(token: Token) -> Option<Self> {
         match token {
@@ -29,25 +40,24 @@ pub enum Expression {
     },
 }
 
-// pub fn pretty_print(expr: Expression, indent: &str, is_last: bool) {
-//     let marker = if is_last { "└──" } else { "├──" };
-//
-//     println!("{}{}{}", indent, marker, expr);
-//
-//     let new_indent = if is_last {
-//         format!("{}    ", indent)
-//     } else {
-//         format!("{}│   ", indent)
-//     };
-//
-//     match expr {
-//         Expression::Integer(integer) => println!("{}{}", new_indent, integer.0),
-//         Expression::Binary(BinaryExpression {
-//             operator,
-//             left,
-//             right,
-//         }) => {
-//             println!("{}
-//         }
-//     }
-// }
+pub fn pretty_print(expr: &Expression) {
+    fn aux(expr: &Expression, indent: &str, is_last: bool) {
+        let branch = if is_last { "└── " } else { "├── " };
+        match expr {
+            Expression::IntegerLiteral(value) => println!("{indent}{branch}IntegerLiteral {value}"),
+            Expression::Binary {
+                operator,
+                left,
+                right,
+            } => {
+                println!("{indent}└── BinaryExpression {operator}");
+
+                let new_indent = format!("{indent}    ");
+                aux(left.as_ref(), &new_indent, false);
+                aux(right.as_ref(), &new_indent, true);
+            }
+        }
+    }
+
+    aux(expr, "", true);
+}

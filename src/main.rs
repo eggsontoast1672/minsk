@@ -1,4 +1,4 @@
-use minsk::{eval, lexer::Token, parser::Parser};
+use minsk::{ast, eval, lexer::Token, parser::Parser};
 
 fn main() {
     let tokens = vec![
@@ -12,6 +12,9 @@ fn main() {
 
     let mut parser = Parser::new(tokens);
     let ast = parser.parse();
+
+    ast::pretty_print(&ast);
+
     let result = eval::evaluate(ast);
 
     println!("result = {result}");
