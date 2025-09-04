@@ -1,15 +1,50 @@
 use std::io::Write;
 
-use minsk::{ast, eval, lexer::Lexer, parser::Parser};
+use minsk::{
+    ast, eval,
+    lexer::{Lexer, Token, TokenKind},
+    parser::Parser,
+};
+
+pub fn print_error(source: &str, offender: Token, c: char) {
+    let mut line_index = 0;
+    let mut column_index = 0;
+    for (index, c) in source.char_indices() {
+        // The index should never be greater, since `offset.start` is exactly at the beginning of
+        // some unicode character.
+        if index >= offender.start {
+            break;
+        }
+
+        column_index += 1;
+        if c == '\n' {
+            line_index += 1;
+            column_index = 0;
+        }
+    }
+
+    let line = source.lines().nth(line_index).unwrap();
+    println!(
+        "stdin:{}:{}: error: unrecognized token '{c}'",
+        line_index + 1,
+        column_index + 1
+    );
+    println!("{:5} | {line}", line_index + 1);
+    print!("      | ");
+    for _ in 0..column_index {
+        print!(" ");
+    }
+    println!("^\n1 error generated.");
+}
 
 fn the_whole_kitchen_sink(source: &str) {
-    let tokens = match Lexer::from_source(source).collect::<Result<Vec<_>, _>>() {
-        Ok(ts) => ts,
-        Err(error) => {
-            println!("{error}");
+    let tokens: Vec<_> = Lexer::from_source(source).collect();
+    for token in &tokens {
+        if let TokenKind::Invalid(c) = token.kind {
+            print_error(source, token.clone(), c);
             return;
         }
-    };
+    }
 
     let ast = match Parser::new(tokens.clone()).parse() {
         Ok(expr) => expr,

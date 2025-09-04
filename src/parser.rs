@@ -51,7 +51,7 @@ where
         match self.tokens.next() {
             Some(Token {
                 kind: TokenKind::EndOfFile,
-                length: _,
+                ..
             }) => Ok(expr),
             _ => Err(ParseError::Syntax),
         }
@@ -108,12 +108,12 @@ where
                 match self.tokens.next() {
                     Some(Token {
                         kind: TokenKind::ParenRight,
-                        length: _,
+                        ..
                     }) => Ok(expr),
                     _ => Err(ParseError::Syntax),
                 }
             }
-            TokenKind::Number(value) => Ok(Expression::IntegerLiteral(value)),
+            TokenKind::Number(value) => Ok(Expression::IntegerLiteral(value.parse().unwrap())),
             _ => Err(ParseError::Syntax),
         }
     }
