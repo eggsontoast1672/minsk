@@ -4,6 +4,7 @@ use minsk::{
     ast, eval,
     lexer::{Lexer, Token, TokenKind},
     parser::Parser,
+    repl::{self, Color},
 };
 
 pub fn print_error(source: &str, offender: Token, c: char) {
@@ -24,17 +25,28 @@ pub fn print_error(source: &str, offender: Token, c: char) {
     }
 
     let line = source.lines().nth(line_index).unwrap();
-    println!(
-        "stdin:{}:{}: error: unrecognized token '{c}'",
-        line_index + 1,
-        column_index + 1
-    );
+
+    repl::set_text_color(Color::White);
+    print!("stdin:{}:{}:", line_index + 1, column_index + 1);
+
+    repl::set_text_color(Color::Red);
+    print!(" error:");
+
+    repl::set_text_color(Color::White);
+    println!(" unrecognized token '{c}'");
+
+    repl::reset_text_color();
     println!("{:5} | {line}", line_index + 1);
     print!("      | ");
     for _ in 0..column_index {
         print!(" ");
     }
-    println!("^\n1 error generated.");
+
+    repl::set_text_color(Color::Green);
+    print!("^");
+
+    repl::reset_text_color();
+    println!("\n1 error generated.");
 }
 
 fn the_whole_kitchen_sink(source: &str) {
