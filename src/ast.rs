@@ -1,51 +1,47 @@
-use crate::lexer::TokenKind;
+use crate::lexer::Token;
 
-#[derive(Clone, Copy)]
-pub enum BinaryOperator {
-    Plus,
-    Minus,
-    Times,
-    Divided,
+#[derive(Clone)]
+pub enum LiteralKind {
+    Integer,
+    Boolean,
 }
 
-impl std::fmt::Display for BinaryOperator {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Plus => write!(f, "+"),
-            Self::Minus => write!(f, "-"),
-            Self::Times => write!(f, "*"),
-            Self::Divided => write!(f, "/"),
-        }
-    }
+#[derive(Clone)]
+pub struct LiteralExpression {
+    pub kind: LiteralKind,
+    pub token: Token,
 }
 
-impl BinaryOperator {
-    pub fn from_token_kind(kind: TokenKind) -> Option<Self> {
-        match kind {
-            TokenKind::Plus => Some(Self::Plus),
-            TokenKind::Minus => Some(Self::Minus),
-            TokenKind::Star => Some(Self::Times),
-            TokenKind::Slash => Some(Self::Divided),
-            _ => None,
-        }
-    }
+#[derive(Clone)]
+pub struct UnaryExpression {
+    pub operator: Token,
+    pub right: Box<Expression>,
+}
+
+#[derive(Clone)]
+pub struct BinaryExpression {
+    pub operator: Token,
+    pub left: Box<Expression>,
+    pub right: Box<Expression>,
 }
 
 #[derive(Clone)]
 pub enum Expression {
-    IntegerLiteral(i32),
-    Binary {
-        operator: BinaryOperator,
-        left: Box<Expression>,
-        right: Box<Expression>,
-    },
+    Literal(LiteralExpression),
+    Unary(UnaryExpression),
+    Binary(BinaryExpression),
 }
 
 pub fn pretty_print(expr: &Expression) {
     fn aux(expr: &Expression, indent: &str, is_last: bool) {
         let branch = if is_last { "└── " } else { "├── " };
         match expr {
-            Expression::IntegerLiteral(value) => println!("{indent}{branch}IntegerLiteral {value}"),
+            Expression::Literal(Literal::Integer(n)) => {
+                println!("{indent}{branch}IntegerLiteral {n}");
+            }
+            Expression::Literal(Literal::Boolean(b)) => {
+                println!("{indent}{branch}BooleanLiteral {b}");
+            }
             Expression::Binary {
                 operator,
                 left,

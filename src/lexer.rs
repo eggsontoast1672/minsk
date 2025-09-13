@@ -1,12 +1,16 @@
 /// The types of tokens in a Minsk program.
 #[derive(Clone, Debug)]
 pub enum TokenKind {
-    Plus,
+    // Single character tokens
+    Bang,
     Minus,
-    Star,
-    Slash,
     ParenLeft,
     ParenRight,
+    Plus,
+    Slash,
+    Star,
+
+    // Other
     Number(String),
     EndOfFile,
     Invalid(char),

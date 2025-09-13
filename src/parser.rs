@@ -1,7 +1,7 @@
 use std::iter::Peekable;
 
 use crate::{
-    ast::{BinaryOperator, Expression},
+    ast::{BinaryOperator, Expression, Literal},
     lexer::{Token, TokenKind},
 };
 
@@ -113,7 +113,9 @@ where
                     _ => Err(ParseError::Syntax),
                 }
             }
-            TokenKind::Number(value) => Ok(Expression::IntegerLiteral(value.parse().unwrap())),
+            TokenKind::Number(value) => Ok(Expression::Literal(Literal::Integer(
+                value.parse().unwrap(),
+            ))),
             _ => Err(ParseError::Syntax),
         }
     }
